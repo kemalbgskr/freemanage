@@ -3,8 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { Invoice, Client, Project } from '../../app/generated/prisma';
 
+interface InvoiceWithRelations extends Invoice {
+  client: Client;
+  project: Project | null;
+}
+
 const InvoicesPage: React.FC = () => {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -41,7 +46,7 @@ const InvoicesPage: React.FC = () => {
           throw new Error(`HTTP error! status: ${projectsResponse.status}`);
         }
 
-        const invoicesData: Invoice[] = await invoicesResponse.json();
+        const invoicesData: InvoiceWithRelations[] = await invoicesResponse.json();
         const clientsData: Client[] = await clientsResponse.json();
         const projectsData: Project[] = await projectsResponse.json();
 
