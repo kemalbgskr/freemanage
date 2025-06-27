@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        String    @id @default(uuid())
+  name      String
+  email     String?   @unique
+  phone     String?
+  company   String?
+  country   String?
+  notes     String?
+  projects  Project[]
+  invoices  Invoice[]
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  name        String
+  deadline    DateTime?
+  value       Float?
+  milestones  String?
+  brief       String?
+  attachments String? // Store as JSON string or comma-separated paths
+  status      String    @default("To Do") // To Do, In Progress, Pending, Done
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  timeEntries TimeEntry[]
+  invoices    Invoice[]
+}
+
+model TimeEntry {
+  id        String    @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime?
+  duration  Float?    // in hours
+  notes     String?
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id])
+}
+
+model Invoice {
+  id          String    @id @default(uuid())
+  invoiceNumber String    @unique
+  issueDate   DateTime
+  dueDate     DateTime
+  amount      Float
+  status      String    @default("Draft") // Draft, Sent, Paid, Overdue
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id])
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  items       Json?     // Store invoice items as JSON
+}

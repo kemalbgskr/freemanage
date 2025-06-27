@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  freemanage-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - freemanage_data:/app/prisma
+    environment:
+      # Ensure this matches your .env DATABASE_URL, but for Docker
+      # We'll update the .env file next to reflect this.
+      DATABASE_URL: "file:/app/prisma/dev.db"
+    # Add a healthcheck to ensure the service is ready
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  freemanage_data:
