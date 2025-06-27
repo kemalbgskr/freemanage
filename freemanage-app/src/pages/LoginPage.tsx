@@ -11,8 +11,28 @@ const LoginPage: React.FC = () => {
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
+  const validateInput = () => {
+    setError(null);
+    // Basic email validation
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+    // Basic password validation (e.g., minimum 6 characters)
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateInput()) {
+      return; // Stop if input is invalid
+    }
+
     setLoading(true);
     setError(null);
 
